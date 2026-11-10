@@ -4,7 +4,7 @@
 // ==========================================
 
 // GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT
-const GOOGLE_SCRIPT_URL = "1L85gyqehk_W1t6QdJ01JacVnhL92RU2Sm6OLU7YSfHY";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzGxu-i1kdaZJGeLWP8-K0nC29dcuJSmqyRA0_9EIWEwmtxXhMTEfvF0JxCQvDI3-VCQ/exec";
 
 // ==========================================
 // CHECKLIST DATA
