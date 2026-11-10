@@ -4,7 +4,7 @@
 // ==========================================
 
 // GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT
-const GOOGLE_SCRIPT_URL = "MASUKKAN_URL_GOOGLE_APPS_SCRIPT_DI_SINI";
+const GOOGLE_SCRIPT_URL = "1L85gyqehk_W1t6QdJ01JacVnhL92RU2Sm6OLU7YSfHY";
 
 // ==========================================
 // CHECKLIST DATA
