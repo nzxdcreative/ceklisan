@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspector Web</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="brand">
+            <div class="brand-icon">V</div>
+            <div>
+                <h2>INSPECTOR</h2>
+                <p>Vehicle Inspection System</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- OPENING PAGE -->
+        <section id="openingPage" class="opening-page">
+            <div class="opening-icon">🚘</div>
+            <h1>Vehicle Inspection</h1>
+            <p>Vehicle condition inspection form</p>
+
+            <button class="new-inspection-btn"
+                    onclick="newInspection()">
+                <span>＋</span> New Inspection
+            </button>
+        </section>
+
+        <!-- INSPECTION FORM -->
+        <section id="inspectionPage" class="inspection-page hidden">
+
+            <div class="page-heading">
+                <div>
+                    <h1>New Inspection</h1>
+                    <p>Isi informasi kendaraan dan lakukan pemeriksaan.</p>
+                </div>
+
+                <button class="back-btn" onclick="backToHome()">
+                    ← Back
+                </button>
+            </div>
+
+            <!-- VEHICLE INFORMATION -->
+            <div class="section">
+                <h3>INFORMASI KENDARAAN</h3>
+
+                <div class="vehicle-info">
+
+                    <div class="form-group">
+                        <label>TANGGAL MASUK</label>
+                        <input type="date" id="tanggalMasuk" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>NAMA VENDOR</label>
+                        <input type="text" id="vendor" placeholder="Nama vendor">
+                    </div>
+
+                    <div class="form-group">
+                        <label>NOPOL</label>
+                        <input type="text" id="nopol" placeholder="Contoh: B 1234 ABC">
+                    </div>
+
+                    <div class="form-group">
+                        <label>MERK / JENIS</label>
+                        <input type="text" id="merk" placeholder="Merk dan jenis kendaraan">
+                    </div>
+
+                    <div class="form-group">
+                        <label>WARNA</label>
+                        <input type="text" id="warna" placeholder="Warna kendaraan">
+                    </div>
+
+                    <div class="form-group">
+                        <label>TAHUN</label>
+                        <input type="number" id="tahun" placeholder="Tahun kendaraan">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- CHECKLIST -->
+            <div id="checklistContainer"></div>
+
+            <!-- ACTION -->
+            <div class="form-actions">
+                <button class="reset-btn" onclick="resetInspection()">
+                    Reset Form
+                </button>
+
+                <button class="save-btn" id="saveBtn"
+                        onclick="saveInspection()">
+                    Simpan Inspeksi
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
