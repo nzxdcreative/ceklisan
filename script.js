@@ -318,7 +318,7 @@ async function saveInspection() {
 
     if (
         !GOOGLE_SCRIPT_URL ||
-        GOOGLE_SCRIPT_URL.includes("MASUKKAN_URL")
+        GOOGLE_SCRIPT_URL.includes("https://script.google.com/macros/s/AKfycbx9PZp8iDbnKicFRvoiMS4FLgH-YThA3Lg1NQp0O9ss4Dr6Y53MBzX0RaL00GTvqvaJcg/exec")
     ) {
         showNotification("URL Google Apps Script belum diatur.");
         return;
