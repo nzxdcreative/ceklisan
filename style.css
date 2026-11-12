@@ -110,10 +110,12 @@ textarea {
 }
 
 .vehicle-art {
+  display: block;
   width: 100%;
   max-width: 210px;
   height: auto;
   overflow: visible;
+  margin: 0 auto;
 }
 
 .vehicle-card span {
