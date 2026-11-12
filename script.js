@@ -186,30 +186,28 @@ const VEHICLE_DATA = {
     )
   },
 
+  "ELECTRIC": {
+    categories: {
+      ...makeCategories(
+        [
+          ...passengerInterior,
+          row("POWER TRUNK", "HIDUP", "MATI/TIDAK ADA")
+        ],
+        passengerBody
+      ),
 
-"ELECTRIC": {
-  categories: {
-    ...makeCategories(
-      [
-        ...passengerInterior,
-        row("POWER TRUNK", "HIDUP", "MATI/TIDAK ADA")
-      ],
-      passengerBody
-    ),
-
-    "KELENGKAPAN TAMBAHAN": [
-      row("TRAVEL CHARGER", "ADA", "TIDAK ADA"),
-      row("ADAPTOR CHARGER", "ADA", "TIDAK ADA"),
-      row("POMPA BAN", "ADA", "TIDAK ADA")
-    ]
+      "KELENGKAPAN TAMBAHAN": [
+        row("TRAVEL CHARGER", "ADA", "TIDAK ADA"),
+        row("ADAPTOR CHARGER", "ADA", "TIDAK ADA"),
+        row("POMPA BAN", "ADA", "TIDAK ADA")
+      ]
+    }
   }
-}
-
+};
 
 // ======================================================
 // ILUSTRASI KENDARAAN VECTOR 3D CARTOON
 // ======================================================
-
 
 function vehicleSVG(type) {
   const id = type.replace(/[^a-z0-9]/gi, "");
