@@ -1,364 +1,327 @@
 
-// ==========================================
-// INSPECTOR WEB - MAIN JAVASCRIPT
-// ==========================================
-
-// GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9PZp8iDbnKicFRvoiMS4FLgH-YThA3Lg1NQp0O9ss4Dr6Y53MBzX0RaL00GTvqvaJcg/exec";
-
-// ==========================================
-// CHECKLIST DATA
-// ==========================================
-
-const inspectionData = [
-    {
-        title: "TEST INTERIOR",
-        items: [
-            ["POWER WINDOW", "HIDUP", "ERROR"],
-            ["RETRACK SPION", "HIDUP", "ERROR"],
-            ["SENTRAL LOCK", "HIDUP", "ERROR"],
-            ["WIPER", "HIDUP", "ERROR"],
-            ["SEIN & LAMPU DEPAN", "HIDUP", "ERROR/MATI"],
-            ["AC", "DINGIN", "PANAS"],
-            ["STEERING WHEEL BUTTON", "BERFUNGSI", "ERROR/MATI"],
-            ["STEERING TEST", "NORMAL", "ADA KERUSAKAN"],
-            ["POWER SLIDING DOOR", "HIDUP", "MATI/TIDAK BERFUNGSI"],
-            ["POWER TRUNK", "HIDUP", "MATI/TIDAK ADA"]
-        ]
-    },
-    {
-        title: "EXTERIOR MESIN",
-        items: [
-            ["AKI", "ADA", "TIDAK ADA"],
-            ["MESIN", "ADA", "TIDAK ADA"],
-            ["TRANSMISI", "ADA", "TIDAK ADA"],
-            ["POWER STEERING", "ADA", "TIDAK ADA"]
-        ]
-    },
-    {
-        title: "PENGECEKAN BODY",
-        items: [
-            ["DEPAN", "AMAN", "BEKAS KENA/NYUNDUL"],
-            ["KAP MESIN", "AMAN", "BONGKARAN/GANTIAN"],
-            ["BELAKANG", "AMAN", "BEKAS KENA/NYUNDUL"],
-            ["PINTU BAGASI", "AMAN", "BEKAS KENA/NYUNDUL"],
-            ["SAMPING KIRI", "AMAN", "BEKAS KENA"],
-            ["SAMPING KANAN", "AMAN", "BEKAS KENA"],
-            ["PINTU DEPAN KIRI", "AMAN", "BEKAS REPAIR/GANTIAN"],
-            ["PINTU DEPAN KANAN", "AMAN", "BEKAS REPAIR/GANTIAN"],
-            ["PINTU TENGAH KIRI", "AMAN", "BEKAS REPAIR/GANTIAN"],
-            ["PINTU TENGAH KANAN", "AMAN", "BEKAS REPAIR/GANTIAN"]
-        ]
-    }
-];
-
-// ==========================================
-// OPENING PAGE
-// ==========================================
-
-function newInspection() {
-    document.getElementById("openingPage").classList.add("hidden");
-    document.getElementById("inspectionPage").classList.remove("hidden");
-
-    document.getElementById("tanggalMasuk").value =
-        new Date().toLocaleDateString("en-CA");
-
-    window.scrollTo(0, 0);
+* {
+  box-sizing: border-box;
 }
 
-function backToHome() {
-    document.getElementById("inspectionPage").classList.add("hidden");
-    document.getElementById("openingPage").classList.remove("hidden");
-
-    window.scrollTo(0, 0);
+body {
+  margin: 0;
+  background: #f2f3f5;
+  color: #222;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-// ==========================================
-// RENDER CHECKLIST
-// ==========================================
-
-function renderChecklist() {
-    const container = document.getElementById("checklistContainer");
-
-    container.innerHTML = "";
-
-    inspectionData.forEach((category, categoryIndex) => {
-
-        const categoryElement = document.createElement("div");
-
-        categoryElement.className = "inspection-category";
-
-        categoryElement.innerHTML = `
-            <div class="category-title">
-                ${category.title}
-            </div>
-        `;
-
-        category.items.forEach((item, itemIndex) => {
-
-            const itemId = `item-${categoryIndex}-${itemIndex}`;
-
-            const row = document.createElement("div");
-
-            row.className = "check-item";
-
-            row.innerHTML = `
-                <div class="item-name">
-                    ${item[0]}
-                </div>
-
-                <div class="answer-area">
-
-                    <div class="answer-buttons">
-
-                        <button
-                            type="button"
-                            class="answer-btn"
-                            id="${itemId}-good"
-                            onclick="selectAnswer(
-                                '${itemId}',
-                                'good'
-                            )">
-                            ${item[1]}
-                        </button>
-
-                        <button
-                            type="button"
-                            class="answer-btn"
-                            id="${itemId}-bad"
-                            onclick="selectAnswer(
-                                '${itemId}',
-                                'bad'
-                            )">
-                            ${item[2]}
-                        </button>
-
-                    </div>
-
-                    <input
-                        type="text"
-                        class="additional-input hidden"
-                        id="${itemId}-note"
-                        placeholder="Masukkan keterangan tambahan..."
-                    >
-
-                </div>
-            `;
-
-            categoryElement.appendChild(row);
-        });
-
-        container.appendChild(categoryElement);
-    });
+.app-header {
+  background: #20242b;
+  color: white;
+  padding: 24px 5%;
 }
 
-// ==========================================
-// ANSWER SELECTION
-// ==========================================
-
-const inspectionAnswers = {};
-
-function selectAnswer(itemId, answer) {
-
-    const goodButton = document.getElementById(`${itemId}-good`);
-    const badButton = document.getElementById(`${itemId}-bad`);
-    const noteInput = document.getElementById(`${itemId}-note`);
-
-    goodButton.classList.remove("selected-good");
-    badButton.classList.remove("selected-bad");
-
-    if (answer === "good") {
-
-        goodButton.classList.add("selected-good");
-
-        noteInput.classList.add("hidden");
-        noteInput.value = "";
-
-        inspectionAnswers[itemId] = {
-            choice: "good",
-            note: ""
-        };
-
-    } else {
-
-        badButton.classList.add("selected-bad");
-
-        noteInput.classList.remove("hidden");
-
-        inspectionAnswers[itemId] = {
-            choice: "bad",
-            note: noteInput.value
-        };
-
-        noteInput.focus();
-    }
-
-    noteInput.oninput = function () {
-        if (inspectionAnswers[itemId]) {
-            inspectionAnswers[itemId].note = this.value;
-        }
-    };
+.app-header h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: 1px;
 }
 
-// ==========================================
-// RESET FORM
-// ==========================================
-
-function resetInspection() {
-
-    const confirmation = confirm(
-        "Apakah kamu yakin ingin menghapus semua data inspeksi ini?"
-    );
-
-    if (!confirmation) return;
-
-    document.querySelectorAll(".form-group input").forEach(input => {
-        input.value = "";
-    });
-
-    document.getElementById("tanggalMasuk").value =
-        new Date().toLocaleDateString("en-CA");
-
-    Object.keys(inspectionAnswers).forEach(key => {
-        delete inspectionAnswers[key];
-    });
-
-    renderChecklist();
-
-    showNotification("Form berhasil direset.");
+.app-header p {
+  margin: 6px 0 0;
+  color: #c6cbd2;
+  font-size: 13px;
 }
 
-// ==========================================
-// NOTIFICATION
-// ==========================================
-
-function showNotification(message) {
-
-    const notification = document.getElementById("notification");
-
-    notification.textContent = message;
-    notification.style.display = "block";
-
-    setTimeout(() => {
-        notification.style.display = "none";
-    }, 3500);
+.container {
+  width: min(1100px, 94%);
+  margin: 25px auto;
 }
 
-// ==========================================
-// COLLECT INSPECTION DATA
-// ==========================================
-
-function collectInspectionData() {
-
-    const vehicle = {
-        tanggalMasuk: document.getElementById("tanggalMasuk").value,
-        vendor: document.getElementById("vendor").value.trim(),
-        nopol: document.getElementById("nopol").value.trim().toUpperCase(),
-        merk: document.getElementById("merk").value.trim(),
-        warna: document.getElementById("warna").value.trim(),
-        tahun: document.getElementById("tahun").value
-    };
-
-    const checklist = [];
-
-    inspectionData.forEach((category, categoryIndex) => {
-
-        category.items.forEach((item, itemIndex) => {
-
-            const itemId = `item-${categoryIndex}-${itemIndex}`;
-            const answer = inspectionAnswers[itemId];
-
-            checklist.push({
-                category: category.title,
-                item: item[0],
-                answer: answer
-                    ? (answer.choice === "good" ? item[1] : item[2])
-                    : "",
-                note: answer ? answer.note : ""
-            });
-        });
-    });
-
-    return {
-        tanggalMasuk: vehicle.tanggalMasuk,
-        vendor: vehicle.vendor,
-        nopol: vehicle.nopol,
-        merk: vehicle.merk,
-        warna: vehicle.warna,
-        tahun: vehicle.tahun,
-        status: "Draft",
-        createdAt: new Date().toISOString(),
-        checklist: checklist
-    };
+.panel {
+  background: white;
+  padding: 22px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.05);
 }
 
-// ==========================================
-// SAVE TO GOOGLE SHEETS
-// ==========================================
-
-async function saveInspection() {
-
-    const button = document.getElementById("saveBtn");
-
-    const data = collectInspectionData();
-
-    if (!data.tanggalMasuk || !data.nopol || !data.merk) {
-        showNotification("Tanggal, Nopol, dan Merk wajib diisi.");
-        return;
-    }
-
-    const unanswered = data.checklist.filter(item => !item.answer);
-
-    if (unanswered.length > 0) {
-        showNotification(
-            `Masih ada ${unanswered.length} item yang belum diperiksa.`
-        );
-        return;
-    }
-
-    if (
-        !GOOGLE_SCRIPT_URL ||
-        GOOGLE_SCRIPT_URL.includes("https://docs.google.com/spreadsheets/d/1L85gyqehk_W1t6QdJ01JacVnhL92RU2Sm6OLU7YSfHY/edit?gid=0#gid=0")
-    ) {
-        showNotification("URL Google Apps Script belum diatur.");
-        return;
-    }
-
-    button.disabled = true;
-    button.textContent = "Mengirim data...";
-
-    try {
-
-        await fetch(GOOGLE_SCRIPT_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-            },
-            body: JSON.stringify(data)
-        });
-
-        showNotification(
-            "Permintaan penyimpanan dikirim. Periksa Google Sheets."
-        );
-
-    } catch (error) {
-
-        console.error(error);
-
-        showNotification("Gagal mengirim data. Periksa koneksi.");
-
-    } finally {
-
-        button.disabled = false;
-        button.textContent = "Simpan Inspeksi";
-    }
+.panel h2 {
+  margin: 0 0 18px;
+  font-size: 17px;
 }
 
-// ==========================================
-// INITIALIZATION
-// ==========================================
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
 
-document.addEventListener("DOMContentLoaded", () => {
-    renderChecklist();
-});
+.form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #cfd3d8;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #2474d2;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-heading p {
+  color: #777;
+  font-size: 13px;
+}
+
+#progress {
+  background: #e8eef8;
+  color: #205ca9;
+  border-radius: 20px;
+  padding: 8px 13px;
+  font-size: 13px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.category {
+  margin-top: 22px;
+  border: 1px solid #c8c8c8;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.category-title {
+  background: #d3d3d3;
+  padding: 11px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.check-item {
+  display: grid;
+  grid-template-columns: 1.2fr repeat(3, 1fr);
+  border-top: 1px solid #ddd;
+  min-height: 48px;
+}
+
+.item-name {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.answer-button {
+  border: 0;
+  border-left: 1px solid #ddd;
+  background: white;
+  padding: 9px 5px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: .15s;
+}
+
+.answer-button:hover {
+  background: #eef3fa;
+}
+
+.answer-button.selected {
+  background: #2468b4;
+  color: white;
+  font-weight: bold;
+}
+
+.custom-input {
+  grid-column: 2 / 5;
+  margin: 0 10px 10px;
+  width: calc(100% - 20px);
+}
+
+.action-panel {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: none;
+  padding: 13px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #2468b4;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #174d8c;
+}
+
+.btn-secondary {
+  background: #e0e2e5;
+  color: #333;
+}
+
+.notification {
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.notification.error {
+  color: #c62828;
+}
+
+.notification.success {
+  color: #218838;
+}
+
+/* Area laporan JPG */
+.report-wrapper {
+  position: absolute;
+  left: -100000px;
+  top: 0;
+}
+
+.report {
+  width: 1200px;
+  padding: 45px;
+  background: white;
+  color: #111;
+  font-family: Arial, sans-serif;
+}
+
+.report-header {
+  text-align: center;
+  border-bottom: 3px solid #222;
+  padding-bottom: 18px;
+  margin-bottom: 25px;
+}
+
+.report-header h1 {
+  font-size: 30px;
+  margin: 0 0 8px;
+}
+
+.report-header p {
+  font-size: 15px;
+  margin: 0;
+}
+
+.report-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin-bottom: 25px;
+  border: 1px solid #222;
+}
+
+.report-info div {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  font-size: 16px;
+}
+
+.report-info strong {
+  display: inline-block;
+  min-width: 165px;
+}
+
+.report-category {
+  margin-top: 22px;
+  border: 1px solid #222;
+}
+
+.report-category h2 {
+  background: #d0d0d0;
+  margin: 0;
+  padding: 12px;
+  font-size: 17px;
+  text-align: center;
+  border-bottom: 1px solid #222;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.report-table th,
+.report-table td {
+  border: 1px solid #333;
+  padding: 11px 10px;
+  font-size: 14px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.report-table th {
+  background: #ededed;
+}
+
+.report-table td:first-child {
+  text-align: left;
+  font-weight: bold;
+  width: 35%;
+}
+
+.report-footer {
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 1px solid #aaa;
+  text-align: center;
+  color: #666;
+  font-size: 12px;
+}
+
+@media (max-width: 650px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .check-item {
+    grid-template-columns: 1fr;
+    padding-bottom: 8px;
+  }
+
+  .item-name {
+    background: #f0f0f0;
+  }
+
+  .answer-button {
+    border: 1px solid #ddd;
+    margin: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .custom-input {
+    grid-column: 1;
+  }
+
+  .action-panel {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
