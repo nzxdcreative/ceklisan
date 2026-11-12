@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5f8fc">
+  <title>ChecklistWeb - Vehicle Inspection</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- HOME PAGE -->
+  <main id="homePage" class="page home-page">
+    <header class="home-header">
+      <h1>ChecklistWeb</h1>
+      <p>Vehicle Inspection System By Ryhh</p>
+      <span class="header-line"></span>
+      <h2>PILIH JENIS KENDARAAN</h2>
+    </header>
+
+    <section id="vehicleMenu" class="vehicle-grid"></section>
+
+    <footer class="home-footer">
+      Create by <strong>Ryhh & GPT</strong>
+    </footer>
+  </main>
+
+  <!-- INSPECTION PAGE -->
+  <main id="inspectionPage" class="page inspection-page hidden">
+
+    <header class="inspection-header">
+      <button type="button" id="backButton" class="back-button">
+        ← Kembali
+      </button>
+      <div>
+        <h1 id="inspectionTitle">INSPEKSI KENDARAAN</h1>
+        <p>Vehicle Inspection Checklist</p>
+      </div>
+    </header>
+
+    <section class="panel">
+      <h2>IDENTITAS KENDARAAN</h2>
+
+      <div class="form-grid">
+        <label>
+          TANGGAL MASUK
+          <input type="date" id="tanggalMasuk" required>
+        </label>
+
+        <label>
+          NAMA VENDOR
+          <input type="text" id="namaVendor" required>
+        </label>
+
+        <label>
+          NOPOL
+          <input type="text" id="nopol" required>
+        </label>
+
+        <label>
+          MERK / JENIS
+          <input type="text" id="merkJenis" required>
+        </label>
+
+        <label>
+          WARNA
+          <input type="text" id="warna" required>
+        </label>
+
+        <label>
+          TAHUN
+          <input type="number" id="tahun" min="1900" max="2100" required>
+        </label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="checklist-heading">
+        <div>
+          <h2>CHECKLIST PEMERIKSAAN</h2>
+          <p>Pilih kondisi sesuai hasil inspeksi kendaraan.</p>
+        </div>
+        <span id="progress">0 / 0</span>
+      </div>
+
+      <div id="checklistContainer"></div>
+    </section>
+
+    <div class="form-actions">
+      <button type="button" id="resetButton" class="button secondary">
+        Reset
+      </button>
+      <button type="button" id="downloadButton" class="button primary">
+        Generate & Download JPG
+      </button>
+    </div>
+
+    <p id="notification" role="status"></p>
+  </main>
+
+  <!-- AREA LAPORAN JPG -->
+  <div id="reportHost" aria-hidden="true">
+    <article id="report" class="report"></article>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>
