@@ -186,150 +186,314 @@ const VEHICLE_DATA = {
     )
   },
 
-  "ELECTRIC": {
-    categories: {
-      ...makeCategories(
-        [
-          ...passengerInterior,
-          row("POWER TRUNK", "HIDUP", "MATI/TIDAK ADA")
-        ],
-        passengerBody
-      ).categories,
-      "KELENGKAPAN TAMBAHAN": [
-        row("TRAVEL CHARGER", "ADA", "TIDAK ADA"),
-        row("ADAPTOR CHARGER", "ADA", "TIDAK ADA"),
-        row("POMPA BAN", "ADA", "TIDAK ADA")
-      ]
-    }
+
+"ELECTRIC": {
+  categories: {
+    ...makeCategories(
+      [
+        ...passengerInterior,
+        row("POWER TRUNK", "HIDUP", "MATI/TIDAK ADA")
+      ],
+      passengerBody
+    ),
+
+    "KELENGKAPAN TAMBAHAN": [
+      row("TRAVEL CHARGER", "ADA", "TIDAK ADA"),
+      row("ADAPTOR CHARGER", "ADA", "TIDAK ADA"),
+      row("POMPA BAN", "ADA", "TIDAK ADA")
+    ]
   }
-};
+}
+
 
 // ======================================================
 // ILUSTRASI KENDARAAN VECTOR 3D CARTOON
 // ======================================================
 
+
 function vehicleSVG(type) {
-  const common = `
+  const id = type.replace(/[^a-z0-9]/gi, "");
+
+  const definitions = `
     <defs>
-      <linearGradient id="bodyPaint" x1="0" y1="0" x2="0.2" y2="1">
+      <linearGradient id="paint-${id}" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="48%" stop-color="#dce5ef"/>
-        <stop offset="100%" stop-color="#8295aa"/>
+        <stop offset="35%" stop-color="#e8edf4"/>
+        <stop offset="75%" stop-color="#b9c7d5"/>
+        <stop offset="100%" stop-color="#8495a8"/>
       </linearGradient>
-      <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#8faec5"/>
-        <stop offset="45%" stop-color="#344c62"/>
-        <stop offset="100%" stop-color="#142333"/>
+
+      <linearGradient id="glass-${id}" x1="0" y1="0" x2="0.8" y2="1">
+        <stop offset="0%" stop-color="#b9d9ed"/>
+        <stop offset="45%" stop-color="#52738c"/>
+        <stop offset="100%" stop-color="#263b50"/>
       </linearGradient>
-      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#f9fbff"/>
-        <stop offset="100%" stop-color="#8798aa"/>
+
+      <linearGradient id="wheel-${id}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#414b57"/>
+        <stop offset="100%" stop-color="#101820"/>
       </linearGradient>
-      <filter id="shadow" x="-30%" y="-50%" width="160%" height="200%">
+
+      <linearGradient id="rim-${id}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="45%" stop-color="#b9c5d0"/>
+        <stop offset="100%" stop-color="#657589"/>
+      </linearGradient>
+
+      <filter id="shadow-${id}" x="-30%" y="-100%" width="160%" height="300%">
         <feGaussianBlur stdDeviation="5"/>
       </filter>
     </defs>
-    <ellipse cx="180" cy="148" rx="128" ry="10"
-      fill="#52657a" opacity=".18" filter="url(#shadow)"/>
   `;
 
-  const wheels = `
+  const shadow = `
+    <ellipse cx="170" cy="143" rx="133" ry="9"
+      fill="#536477" opacity=".22"
+      filter="url(#shadow-${id})"/>
+  `;
+
+  // RODA
+  const wheel = (x) => `
     <g>
-      <circle cx="92" cy="129" r="20" fill="#1d2732"/>
-      <circle cx="92" cy="129" r="12" fill="url(#metal)"/>
-      <circle cx="92" cy="129" r="5" fill="#566779"/>
-      <circle cx="257" cy="129" r="20" fill="#1d2732"/>
-      <circle cx="257" cy="129" r="12" fill="url(#metal)"/>
-      <circle cx="257" cy="129" r="5" fill="#566779"/>
+      <circle cx="${x}" cy="126" r="21"
+        fill="url(#wheel-${id})"
+        stroke="#273442" stroke-width="2"/>
+
+      <circle cx="${x}" cy="126" r="13"
+        fill="url(#rim-${id})"
+        stroke="#64748b" stroke-width="1.5"/>
+
+      <circle cx="${x}" cy="126" r="7"
+        fill="#7c8997"/>
+
+      <circle cx="${x}" cy="126" r="3"
+        fill="#e9eef4"/>
+
+      <path d="M${x-8} 117 L${x+7} 135 M${x+8} 117 L${x-7} 135"
+        stroke="#eef2f6" stroke-width="2" opacity=".7"/>
     </g>
   `;
 
   let body = "";
+  let windows = "";
+  let details = "";
 
-  if (type === "MINIBUS" || type === "BLINDVAN") {
+  // MINIBUS
+  if (type === "MINIBUS") {
     body = `
-      <path d="M35 112 L43 77 Q47 62 66 59 L111 38
-        L227 38 Q244 39 253 58 L280 94
-        L291 111 L285 124 L45 124 Z"
-        fill="url(#bodyPaint)" stroke="#718398" stroke-width="2"/>
-      <path d="M58 76 L72 53 L111 47 L111 88 L56 88 Z"
-        fill="url(#glass)" stroke="#7d8fa0" stroke-width="2"/>
-      <path d="M118 47 L222 47 Q236 48 245 68 L257 89 L118 89 Z"
-        fill="url(#glass)" stroke="#7d8fa0" stroke-width="2"/>
-      <path d="M35 112 L289 112 L282 126 L46 126 Z"
-        fill="#8294a7"/>
-      <rect x="260" y="94" width="18" height="7" rx="3" fill="#fff3c5"/>
-      <rect x="43" y="96" width="8" height="14" rx="2" fill="#d94e4e"/>
-      <path d="M117 47 L117 112" stroke="#8191a2" stroke-width="2"/>
-      <path d="M182 47 L182 112" stroke="#8191a2" stroke-width="2"/>
-      <path d="M47 116 L280 116" stroke="#ffffff" stroke-width="2" opacity=".8"/>
+      <path d="M35 115 L42 75 Q44 63 60 58
+        L103 39 Q111 35 124 35
+        L245 35 Q263 35 273 56
+        L294 100 L301 115 L295 128
+        L39 128 Z"
+        fill="url(#paint-${id})"
+        stroke="#7f91a5" stroke-width="2"/>
+
+      <path d="M44 74 L104 43 L116 43 L116 86 L43 86 Z"
+        fill="url(#glass-${id})"
+        stroke="#8295a8" stroke-width="2"/>
+
+      <path d="M123 43 L172 43 L172 86 L123 86 Z"
+        fill="url(#glass-${id})"
+        stroke="#8295a8" stroke-width="2"/>
+
+      <path d="M179 43 L238 43 Q252 43 260 60
+        L272 86 L179 86 Z"
+        fill="url(#glass-${id})"
+        stroke="#8295a8" stroke-width="2"/>
     `;
-  } else if (type === "PICK UP") {
-    body = `
-      <path d="M36 111 L45 77 Q49 62 70 60 L129 60
-        L149 92 L178 92 L178 65 L273 65 L283 106
-        L294 111 L288 126 L45 126 Z"
-        fill="url(#bodyPaint)" stroke="#718398" stroke-width="2"/>
-      <path d="M61 78 L74 65 L119 65 L139 91 L59 91 Z"
-        fill="url(#glass)" stroke="#7d8fa0" stroke-width="2"/>
-      <path d="M149 94 L175 94 L175 64 L269 64 L274 94 Z"
-        fill="#e8eef4" stroke="#718398" stroke-width="2"/>
-      <path d="M185 70 L268 70" stroke="#a5b3c2" stroke-width="2"/>
-      <path d="M179 96 L275 96" stroke="#718398" stroke-width="2"/>
-      <rect x="270" y="101" width="15" height="7" rx="3" fill="#fff3c5"/>
-      <rect x="42" y="99" width="8" height="12" rx="2" fill="#d94e4e"/>
-    `;
-  } else if (type === "TRUCK") {
-    body = `
-      <path d="M24 107 L31 54 Q34 44 45 44 L217 44
-        Q224 44 224 54 L224 111 L285 111
-        L299 122 L294 132 L29 132 Z"
-        fill="url(#bodyPaint)" stroke="#718398" stroke-width="2"/>
-      <path d="M35 55 L215 55 L215 108 L35 108 Z"
-        fill="#e7edf3" stroke="#8b9bab" stroke-width="2"/>
-      <path d="M223 77 L258 77 Q270 77 277 92
-        L285 111 L223 111 Z"
-        fill="url(#bodyPaint)" stroke="#718398" stroke-width="2"/>
-      <path d="M232 82 L258 82 Q266 82 272 95
-        L276 101 L232 101 Z"
-        fill="url(#glass)" stroke="#718398" stroke-width="2"/>
-      <path d="M226 107 L286 107" stroke="#718398" stroke-width="3"/>
-      <rect x="284" y="111" width="9" height="7" rx="2" fill="#fff3c5"/>
-      <rect x="27" y="112" width="8" height="13" rx="2" fill="#d94e4e"/>
-    `;
-  } else {
-    body = `
-      <path d="M34 112 L48 89 Q63 69 94 66
-        L142 51 Q167 45 192 57 L242 79
-        Q260 87 276 108 L282 119
-        L270 127 L43 127 Z"
-        fill="url(#bodyPaint)" stroke="#718398" stroke-width="2"/>
-      <path d="M94 68 L139 55 Q161 50 181 60
-        L215 79 L100 82 Z"
-        fill="url(#glass)" stroke="#7d8fa0" stroke-width="2"/>
-      <path d="M188 62 L215 79 L247 91 L232 82
-        Q223 70 205 65 Z"
-        fill="url(#glass)" stroke="#7d8fa0" stroke-width="2"/>
-      <path d="M105 83 L247 83" stroke="#718398" stroke-width="2"/>
-      <path d="M40 109 L60 109" stroke="#fff3c5" stroke-width="6"/>
-      <rect x="268" y="103" width="9" height="13" rx="3" fill="#d94e4e"/>
-      ${type === "ELECTRIC" ? `
-        <path d="M55 121 L267 121" stroke="#39a9e9" stroke-width="4"/>
-        <path d="M160 54 L170 54" stroke="#39a9e9" stroke-width="3"/>
-      ` : ""}
+
+    details = `
+      <path d="M117 42 L117 113 M176 42 L176 113"
+        stroke="#899aab" stroke-width="2"/>
+      <path d="M42 110 L294 110"
+        stroke="#ffffff" stroke-width="3" opacity=".8"/>
     `;
   }
 
+  // SEDAN
+  else if (type === "SEDAN" || type === "ELECTRIC") {
+    body = `
+      <path d="M32 115 L43 99 L63 88
+        L91 83 L119 54
+        Q130 43 153 43
+        L203 43 Q224 43 239 61
+        L260 85 L287 97
+        L300 115 L294 128
+        L39 128 Z"
+        fill="url(#paint-${id})"
+        stroke="#7f91a5" stroke-width="2"/>
+
+      <path d="M101 81 L126 56
+        Q135 48 154 48
+        L169 48 L169 82 Z"
+        fill="url(#glass-${id})"
+        stroke="#8295a8" stroke-width="2"/>
+
+      <path d="M177 48 L201 48
+        Q219 48 232 65
+        L245 82 L177 82 Z"
+        fill="url(#glass-${id})"
+        stroke="#8295a8" stroke-width="2"/>
+    `;
+
+    details = `
+      <path d="M173 47 L173 111"
+        stroke="#899aab" stroke-width="2"/>
+      <path d="M41 108 L291 108"
+        stroke="#ffffff" stroke-width="3" opacity=".8"/>
+      <path d="M74 89 L89 89"
+        stroke="#718398" stroke-width="2"/>
+    `;
+
+    if (type === "ELECTRIC") {
+      details += `
+        <path d="M48 119 L282 119"
+          stroke="#38a9e8" stroke-width="3"/>
+        <path d="M151 51 L161 51"
+          stroke="#38a9e8" stroke-width="3"/>
+      `;
+    }
+  }
+
+  // PICK UP
+  else if (type === "PICK UP") {
+    body = `
+      <path d="M32 113 L43 78
+        Q47 65 65 62
+        L119 62 L147 92
+        L177 92 L177 60
+        L276 60 L286 96
+        L299 113 L294 128
+        L39 128 Z"
+        fill="url(#paint-${id})"
+        stroke="#7f91a5" stroke-width="2"/>
+
+      <path d="M54 78 L69 68 L116 68
+        L136 91 L53 91 Z"
+        fill="url(#glass-${id})"
+        stroke="#8295a8" stroke-width="2"/>
+
+      <path d="M183 67 L270 67 L278 91
+        L183 91 Z"
+        fill="#dce5ed"
+        stroke="#8798aa" stroke-width="2"/>
+    `;
+
+    details = `
+      <path d="M145 61 L145 112 M179 61 L179 112"
+        stroke="#899aab" stroke-width="2"/>
+      <path d="M184 72 L270 72"
+        stroke="#ffffff" stroke-width="2" opacity=".7"/>
+      <path d="M183 96 L282 96"
+        stroke="#718398" stroke-width="2"/>
+    `;
+  }
+
+  // BLINDVAN
+  else if (type === "BLINDVAN") {
+    body = `
+      <path d="M35 115 L43 73
+        Q46 58 64 53
+        L105 37 L252 37
+        Q271 37 278 59
+        L295 103 L301 115
+        L294 128 L39 128 Z"
+        fill="url(#paint-${id})"
+        stroke="#7f91a5" stroke-width="2"/>
+
+      <path d="M47 73 L108 43 L121 43
+        L121 87 L43 87 Z"
+        fill="url(#glass-${id})"
+        stroke="#8295a8" stroke-width="2"/>
+
+      <path d="M128 43 L244 43
+        Q259 43 266 64 L276 87 L128 87 Z"
+        fill="#c7d2df"
+        stroke="#8295a8" stroke-width="2"/>
+    `;
+
+    details = `
+      <path d="M122 43 L122 112"
+        stroke="#899aab" stroke-width="2"/>
+      <path d="M48 110 L290 110"
+        stroke="#ffffff" stroke-width="3" opacity=".8"/>
+      <path d="M230 43 L230 109"
+        stroke="#899aab" stroke-width="1.5"/>
+    `;
+  }
+
+  // TRUCK ENGKEL
+  else if (type === "TRUCK") {
+    body = `
+      <path d="M28 112 L35 53
+        Q37 44 48 44
+        L211 44 L211 112
+        L294 112 L301 123
+        L295 132 L33 132 Z"
+        fill="url(#paint-${id})"
+        stroke="#7f91a5" stroke-width="2"/>
+
+      <path d="M221 73 L254 73
+        Q268 73 276 91
+        L285 112 L221 112 Z"
+        fill="url(#paint-${id})"
+        stroke="#7f91a5" stroke-width="2"/>
+
+      <path d="M230 79 L254 79
+        Q264 79 270 94 L276 103 L230 103 Z"
+        fill="url(#glass-${id})"
+        stroke="#8295a8" stroke-width="2"/>
+
+      <path d="M42 51 L204 51 L204 105 L42 105 Z"
+        fill="#dce5ed"
+        stroke="#899aab" stroke-width="1.5"/>
+    `;
+    
+    details = `
+      <path d="M212 45 L212 112"
+        stroke="#899aab" stroke-width="3"/>
+      <path d="M42 108 L285 108"
+        stroke="#ffffff" stroke-width="3" opacity=".8"/>
+      <path d="M45 57 L201 57"
+        stroke="#ffffff" stroke-width="2" opacity=".7"/>
+    `;
+  }
+
+  // AKSESORIS UMUM
+  const frontDetails = `
+    <rect x="292" y="104" width="8" height="10"
+      rx="3" fill="#fff1bd"/>
+    <rect x="36" y="103" width="7" height="13"
+      rx="2" fill="#d95c5c"/>
+    <path d="M48 128 L291 128"
+      stroke="#65778b" stroke-width="2"/>
+  `;
+
+  const wheels = `
+    ${wheel(91)}
+    ${wheel(253)}
+  `;
+
   return `
-    <svg class="vehicle-art" viewBox="0 0 330 165"
-      xmlns="http://www.w3.org/2000/svg" role="img"
-      aria-label="Ilustrasi ${type}">
-      ${common}
-      ${wheels}
+    <svg class="vehicle-art"
+      viewBox="0 0 330 165"
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label="Ilustrasi ${type} tampak samping">
+
+      ${definitions}
+      ${shadow}
       ${body}
+      ${windows}
+      ${details}
+      ${frontDetails}
+      ${wheels}
+
     </svg>
   `;
 }
+
 
 // ======================================================
 // STATE APLIKASI
