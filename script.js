@@ -1,327 +1,469 @@
 
-* {
-  box-sizing: border-box;
+const inspectionData = [
+  {
+    category: "TEST INTERIOR",
+    items: [
+      ["POWER WINDOW", "HIDUP", "ERROR", "custom"],
+      ["RETRACK SPION", "HIDUP", "ERROR", "custom"],
+      ["SENTRAL LOCK", "HIDUP", "ERROR", "custom"],
+      ["WIPER", "HIDUP", "ERROR", "custom"],
+      ["SEIN & LAMPU DEPAN", "HIDUP", "ERROR/MATI", "custom"],
+      ["AC", "DINGIN", "PANAS", "custom"],
+      ["STEERING WHEEL BUTTON", "BERFUNGSI", "ERROR/MATI", "custom"],
+      ["STEERING TEST", "NORMAL", "ADA KERUSAKAN", "custom"],
+      ["POWER SLIDING DOOR", "HIDUP", "MATI/TIDAK BERFUNGSI", "custom"],
+      ["POWER TRUNK", "HIDUP", "MATI/TIDAK ADA", "custom"]
+    ]
+  },
+  {
+    category: "EXTERIOR MESIN",
+    items: [
+      ["AKI", "ADA", "TIDAK ADA", "custom"],
+      ["MESIN", "ADA", "TIDAK ADA", "custom"],
+      ["TRANSMISI", "ADA", "TIDAK ADA", "custom"],
+      ["POWER STEERING", "ADA", "TIDAK ADA", "custom"]
+    ]
+  },
+  {
+    category: "PENGECEKAN BODY",
+    items: [
+      ["DEPAN", "AMAN", "BEKAS KENA/NYUNDUL", "custom"],
+      ["KAP MESIN", "AMAN", "BONGKARAN/GANTIAN", "custom"],
+      ["BELAKANG", "AMAN", "BEKAS KENA/NYUNDUL", "custom"],
+      ["PINTU BAGASI", "AMAN", "BONGKARAN/GANTIAN", "custom"],
+      ["SAMPING KIRI", "AMAN", "BEKAS KENA", "custom"],
+      ["SAMPING KANAN", "AMAN", "BEKAS KENA", "custom"],
+      ["PINTU DEPAN KIRI", "AMAN", "BEKAS REPAIR/GANTIAN", "custom"],
+      ["PINTU DEPAN KANAN", "AMAN", "BEKAS REPAIR/GANTIAN", "custom"],
+      ["PINTU TENGAH KIRI", "AMAN", "BEKAS REPAIR/GANTIAN", "custom"],
+      ["PINTU TENGAH KANAN", "AMAN", "BEKAS REPAIR/GANTIAN", "custom"],
+      ["BEKAS BANJIR", "AMAN", "BEKAS BANJIR", "custom"],
+      ["BEKAS TERGULING", "AMAN", "BEKAS TERGULING", "custom"],
+      ["KACA", "AMAN", "ADA PECAH/RETAK", "custom"],
+      ["CAT", "ORI", "BEBERAPA PANEL", "FULL BODY"]
+    ]
+  },
+  {
+    category: "KARAT",
+    items: [
+      ["NOMOR RANGKA", "AMAN", "ADA KARAT", "custom"],
+      ["NOMOR MESIN", "AMAN", "ADA KARAT", "custom"],
+      ["RANGKA BAWAH", "AMAN", "ADA KARAT", "custom"],
+      ["BODY", "AMAN", "ADA KARAT", "custom"]
+    ]
+  }
+];
+
+const answers = {};
+
+const checklistContainer = document.getElementById("checklistContainer");
+const progressElement = document.getElementById("progress");
+const notification = document.getElementById("notification");
+
+const totalItems = inspectionData.reduce(
+  (total, category) => total + category.items.length,
+  0
+);
+
+// Tanggal hari ini menggunakan zona waktu lokal browser
+function getToday() {
+  const now = new Date();
+  const offset = now.getTimezoneOffset();
+  return new Date(now.getTime() - offset * 60000)
+    .toISOString()
+    .slice(0, 10);
 }
 
-body {
-  margin: 0;
-  background: #f2f3f5;
-  color: #222;
-  font-family: Arial, Helvetica, sans-serif;
+document.getElementById("tanggalMasuk").value = getToday();
+
+// Membuat checklist
+function renderChecklist() {
+  checklistContainer.innerHTML = "";
+
+  inspectionData.forEach((category, categoryIndex) => {
+    const categoryElement = document.createElement("div");
+    categoryElement.className = "category";
+
+    const title = document.createElement("div");
+    title.className = "category-title";
+    title.textContent = category.category;
+
+    categoryElement.appendChild(title);
+
+    category.items.forEach((item, itemIndex) => {
+      const key = `${categoryIndex}-${itemIndex}`;
+
+      const row = document.createElement("div");
+      row.className = "check-item";
+
+      const name = document.createElement("div");
+      name.className = "item-name";
+      name.textContent = item[0];
+
+      row.appendChild(name);
+
+      item.slice(1).forEach((option, optionIndex) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "answer-button";
+        button.textContent = option === "custom" ? "ISI SENDIRI" : option;
+
+        button.dataset.key = key;
+        button.dataset.choice = optionIndex;
+
+        if (
+          answers[key] &&
+          answers[key].choice === optionIndex
+        ) {
+          button.classList.add("selected");
+        }
+
+        row.appendChild(button);
+      });
+
+      // Input tambahan hanya untuk pilihan ISI SENDIRI
+      if (
+        answers[key] &&
+        answers[key].choice === 2 &&
+        item[3] === "custom"
+      ) {
+        const customInput = document.createElement("input");
+        customInput.type = "text";
+        customInput.className = "custom-input";
+        customInput.placeholder = "Tuliskan kondisi kendaraan...";
+        customInput.value = answers[key].custom || "";
+        customInput.dataset.customKey = key;
+        row.appendChild(customInput);
+      }
+
+      categoryElement.appendChild(row);
+    });
+
+    checklistContainer.appendChild(categoryElement);
+  });
+
+  updateProgress();
 }
 
-.app-header {
-  background: #20242b;
-  color: white;
-  padding: 24px 5%;
+// Menghitung progres pemeriksaan
+function updateProgress() {
+  const completed = Object.keys(answers).filter(
+    key => answers[key].value
+  ).length;
+
+  progressElement.textContent = `${completed} / ${totalItems}`;
 }
 
-.app-header h1 {
-  margin: 0;
-  font-size: 24px;
-  letter-spacing: 1px;
-}
+// Memilih jawaban
+checklistContainer.addEventListener("click", function(event) {
+  const button = event.target.closest(".answer-button");
 
-.app-header p {
-  margin: 6px 0 0;
-  color: #c6cbd2;
-  font-size: 13px;
-}
+  if (!button) return;
 
-.container {
-  width: min(1100px, 94%);
-  margin: 25px auto;
-}
+  const key = button.dataset.key;
+  const choice = Number(button.dataset.choice);
 
-.panel {
-  background: white;
-  padding: 22px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 10px rgba(0,0,0,.05);
-}
+  const [categoryIndex, itemIndex] = key.split("-").map(Number);
+  const item = inspectionData[categoryIndex].items[itemIndex];
+  const selectedOption = item[choice + 1];
 
-.panel h2 {
-  margin: 0 0 18px;
-  font-size: 17px;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-}
-
-.form-grid label {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  font-size: 13px;
-  font-weight: bold;
-}
-
-input {
-  width: 100%;
-  padding: 11px;
-  border: 1px solid #cfd3d8;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-input:focus {
-  outline: none;
-  border-color: #2474d2;
-}
-
-.section-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.section-heading p {
-  color: #777;
-  font-size: 13px;
-}
-
-#progress {
-  background: #e8eef8;
-  color: #205ca9;
-  border-radius: 20px;
-  padding: 8px 13px;
-  font-size: 13px;
-  font-weight: bold;
-  white-space: nowrap;
-}
-
-.category {
-  margin-top: 22px;
-  border: 1px solid #c8c8c8;
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.category-title {
-  background: #d3d3d3;
-  padding: 11px;
-  text-align: center;
-  font-size: 13px;
-  font-weight: bold;
-}
-
-.check-item {
-  display: grid;
-  grid-template-columns: 1.2fr repeat(3, 1fr);
-  border-top: 1px solid #ddd;
-  min-height: 48px;
-}
-
-.item-name {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  font-size: 13px;
-  font-weight: bold;
-}
-
-.answer-button {
-  border: 0;
-  border-left: 1px solid #ddd;
-  background: white;
-  padding: 9px 5px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: .15s;
-}
-
-.answer-button:hover {
-  background: #eef3fa;
-}
-
-.answer-button.selected {
-  background: #2468b4;
-  color: white;
-  font-weight: bold;
-}
-
-.custom-input {
-  grid-column: 2 / 5;
-  margin: 0 10px 10px;
-  width: calc(100% - 20px);
-}
-
-.action-panel {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.btn {
-  border: none;
-  padding: 13px 20px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-primary {
-  background: #2468b4;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #174d8c;
-}
-
-.btn-secondary {
-  background: #e0e2e5;
-  color: #333;
-}
-
-.notification {
-  text-align: center;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.notification.error {
-  color: #c62828;
-}
-
-.notification.success {
-  color: #218838;
-}
-
-/* Area laporan JPG */
-.report-wrapper {
-  position: absolute;
-  left: -100000px;
-  top: 0;
-}
-
-.report {
-  width: 1200px;
-  padding: 45px;
-  background: white;
-  color: #111;
-  font-family: Arial, sans-serif;
-}
-
-.report-header {
-  text-align: center;
-  border-bottom: 3px solid #222;
-  padding-bottom: 18px;
-  margin-bottom: 25px;
-}
-
-.report-header h1 {
-  font-size: 30px;
-  margin: 0 0 8px;
-}
-
-.report-header p {
-  font-size: 15px;
-  margin: 0;
-}
-
-.report-info {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  margin-bottom: 25px;
-  border: 1px solid #222;
-}
-
-.report-info div {
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-  font-size: 16px;
-}
-
-.report-info strong {
-  display: inline-block;
-  min-width: 165px;
-}
-
-.report-category {
-  margin-top: 22px;
-  border: 1px solid #222;
-}
-
-.report-category h2 {
-  background: #d0d0d0;
-  margin: 0;
-  padding: 12px;
-  font-size: 17px;
-  text-align: center;
-  border-bottom: 1px solid #222;
-}
-
-.report-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
-.report-table th,
-.report-table td {
-  border: 1px solid #333;
-  padding: 11px 10px;
-  font-size: 14px;
-  text-align: center;
-  overflow-wrap: anywhere;
-}
-
-.report-table th {
-  background: #ededed;
-}
-
-.report-table td:first-child {
-  text-align: left;
-  font-weight: bold;
-  width: 35%;
-}
-
-.report-footer {
-  margin-top: 30px;
-  padding-top: 15px;
-  border-top: 1px solid #aaa;
-  text-align: center;
-  color: #666;
-  font-size: 12px;
-}
-
-@media (max-width: 650px) {
-  .form-grid {
-    grid-template-columns: 1fr;
+  if (selectedOption === "custom") {
+    answers[key] = {
+      choice,
+      value: "",
+      custom: ""
+    };
+  } else {
+    answers[key] = {
+      choice,
+      value: selectedOption,
+      custom: ""
+    };
   }
 
-  .check-item {
-    grid-template-columns: 1fr;
-    padding-bottom: 8px;
+  renderChecklist();
+});
+
+// Menyimpan teks pilihan ISI SENDIRI
+checklistContainer.addEventListener("input", function(event) {
+  const input = event.target;
+
+  if (!input.dataset.customKey) return;
+
+  const key = input.dataset.customKey;
+
+  if (answers[key]) {
+    answers[key].custom = input.value.trim();
+    answers[key].value = input.value.trim();
   }
 
-  .item-name {
-    background: #f0f0f0;
+  updateProgress();
+});
+
+// Mengambil identitas kendaraan
+function getVehicleData() {
+  return {
+    tanggal: document.getElementById("tanggalMasuk").value,
+    vendor: document.getElementById("namaVendor").value.trim(),
+    nopol: document.getElementById("nopol").value.trim(),
+    merk: document.getElementById("merkJenis").value.trim(),
+    warna: document.getElementById("warna").value.trim(),
+    tahun: document.getElementById("tahun").value.trim()
+  };
+}
+
+// Validasi sebelum membuat laporan
+function validateForm() {
+  const vehicle = getVehicleData();
+
+  for (const [key, value] of Object.entries(vehicle)) {
+    if (!value) {
+      showNotification("Mohon lengkapi seluruh identitas kendaraan.", "error");
+      document.getElementById(
+        {
+          tanggal: "tanggalMasuk",
+          vendor: "namaVendor",
+          nopol: "nopol",
+          merk: "merkJenis",
+          warna: "warna",
+          tahun: "tahun"
+        }[key]
+      ).focus();
+
+      return false;
+    }
   }
 
-  .answer-button {
-    border: 1px solid #ddd;
-    margin: 2px 8px;
-    border-radius: 4px;
+  for (let c = 0; c < inspectionData.length; c++) {
+    for (let i = 0; i < inspectionData[c].items.length; i++) {
+      const key = `${c}-${i}`;
+
+      if (!answers[key] || !answers[key].value) {
+        showNotification(
+          `Masih ada item yang belum diperiksa: ${inspectionData[c].items[i][0]}`,
+          "error"
+        );
+
+        return false;
+      }
+    }
   }
 
-  .custom-input {
-    grid-column: 1;
+  return true;
+}
+
+// Mengamankan teks agar tidak menjadi HTML
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[character]);
+}
+
+// Format tanggal untuk laporan
+function formatDate(dateString) {
+  const date = new Date(dateString + "T00:00:00");
+
+  return date.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  });
+}
+
+// Membuat isi laporan
+function generateReport() {
+  const vehicle = getVehicleData();
+  const report = document.getElementById("report");
+
+  let categoriesHTML = "";
+
+  inspectionData.forEach((category, categoryIndex) => {
+    let rows = "";
+
+    category.items.forEach((item, itemIndex) => {
+      const key = `${categoryIndex}-${itemIndex}`;
+      const answer = answers[key];
+
+      const selectedText =
+        answer.choice === 2 && item[3] === "custom"
+          ? `ISI SENDIRI: ${answer.custom}`
+          : answer.value;
+
+      rows += `
+        <tr>
+          <td>${escapeHTML(item[0])}</td>
+          <td>${escapeHTML(selectedText)}</td>
+        </tr>
+      `;
+    });
+
+    categoriesHTML += `
+      <section class="report-category">
+        <h2>${escapeHTML(category.category)}</h2>
+
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>ITEM PEMERIKSAAN</th>
+              <th>HASIL INSPEKSI</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      </section>
+    `;
+  });
+
+  report.innerHTML = `
+    <div class="report-header">
+      <h1>VEHICLE INSPECTION REPORT</h1>
+      <p>LAPORAN HASIL PEMERIKSAAN KENDARAAN</p>
+    </div>
+
+    <div class="report-info">
+      <div><strong>TANGGAL MASUK</strong>: ${escapeHTML(formatDate(vehicle.tanggal))}</div>
+      <div><strong>NAMA VENDOR</strong>: ${escapeHTML(vehicle.vendor)}</div>
+      <div><strong>NOPOL</strong>: ${escapeHTML(vehicle.nopol.toUpperCase())}</div>
+      <div><strong>MERK / JENIS</strong>: ${escapeHTML(vehicle.merk)}</div>
+      <div><strong>WARNA</strong>: ${escapeHTML(vehicle.warna)}</div>
+      <div><strong>TAHUN</strong>: ${escapeHTML(vehicle.tahun)}</div>
+    </div>
+
+    ${categoriesHTML}
+
+    <div class="report-footer">
+      Dokumen dibuat secara digital melalui Inspector Web.
+    </div>
+  `;
+
+  return report;
+}
+
+// Notifikasi
+function showNotification(message, type) {
+  notification.textContent = message;
+  notification.className = `notification ${type}`;
+
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth"
+  });
+}
+
+// Generate dan download JPG
+async function downloadJPG() {
+  if (!validateForm()) return;
+
+  if (typeof html2canvas !== "function") {
+    showNotification(
+      "Library pembuat JPG belum termuat. Periksa koneksi internet lalu muat ulang halaman.",
+      "error"
+    );
+    return;
   }
 
-  .action-panel {
-    flex-direction: column;
-  }
+  const button = document.getElementById("downloadButton");
 
-  .btn {
-    width: 100%;
+  try {
+    button.disabled = true;
+    button.textContent = "Membuat JPG...";
+
+    const report = generateReport();
+
+    // Tunggu browser menyelesaikan layout laporan
+    await new Promise(resolve => requestAnimationFrame(resolve));
+
+    const canvas = await html2canvas(report, {
+      scale: 3,
+      backgroundColor: "#ffffff",
+      useCORS: true,
+      logging: false,
+      windowWidth: 1300
+    });
+
+    const blob = await new Promise(resolve => {
+      canvas.toBlob(resolve, "image/jpeg", 0.98);
+    });
+
+    if (!blob) {
+      throw new Error("Gagal membuat file JPG.");
+    }
+
+    const vehicle = getVehicleData();
+
+    const safeNopol = vehicle.nopol
+      .toUpperCase()
+      .replace(/[^A-Z0-9-]/g, "_");
+
+    const fileName = `INSPEKSI_${safeNopol}_${vehicle.tanggal}.jpg`;
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = fileName;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+
+    showNotification("Laporan inspeksi berhasil dibuat dan diunduh!", "success");
+
+  } catch (error) {
+    console.error("Gagal membuat JPG:", error);
+
+    showNotification(
+      "Gagal membuat JPG. Silakan periksa Console browser untuk detail error.",
+      "error"
+    );
+
+  } finally {
+    button.disabled = false;
+    button.textContent = "Generate & Download JPG";
   }
 }
+
+// Reset form
+function resetForm() {
+  if (!confirm("Apakah kamu yakin ingin menghapus seluruh data inspeksi?")) {
+    return;
+  }
+
+  document.getElementById("tanggalMasuk").value = getToday();
+
+  document.getElementById("namaVendor").value = "";
+  document.getElementById("nopol").value = "";
+  document.getElementById("merkJenis").value = "";
+  document.getElementById("warna").value = "";
+  document.getElementById("tahun").value = "";
+
+  Object.keys(answers).forEach(key => delete answers[key]);
+
+  notification.textContent = "";
+  notification.className = "notification";
+
+  renderChecklist();
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+// Event tombol
+document.getElementById("downloadButton")
+  .addEventListener("click", downloadJPG);
+
+document.getElementById("resetButton")
+  .addEventListener("click", resetForm);
+
+// Jalankan aplikasi
+renderChecklist();
